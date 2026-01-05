@@ -11,95 +11,97 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
-    body {
-      height: 100vh;
-      background: #0f172a;
-      overflow: hidden;
+    html, body {
+      height: 100%;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: #121212;
     }
 
     /* ===== CONTAINER PRINCIPAL ===== */
-    .contador-app-container {
+    .cq-app {
       height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    /* ===== BOTÕES PRINCIPAIS ===== */
-    .contador-botao {
+    /* ===== BOTÕES ===== */
+    .cq-botao {
       flex: 1;
       border: none;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(4rem, 12vw, 7rem);
-      font-weight: 800;
-      color: #ffffff;
-      cursor: pointer;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
       user-select: none;
     }
 
-    .contador-botao-erro {
-      background: linear-gradient(145deg, #dc2626, #991b1b);
-      box-shadow: inset 0 6px 12px rgba(255,255,255,0.15),
-                  inset 0 -6px 12px rgba(0,0,0,0.4);
+    .cq-botao-erro {
+      background: linear-gradient(160deg, #ff4d4d, #c62828);
+      box-shadow: inset 0 -8px 15px rgba(0,0,0,0.35);
     }
 
-    .contador-botao-acerto {
-      background: linear-gradient(145deg, #16a34a, #166534);
-      box-shadow: inset 0 6px 12px rgba(255,255,255,0.15),
-                  inset 0 -6px 12px rgba(0,0,0,0.4);
+    .cq-botao-acerto {
+      background: linear-gradient(160deg, #4caf50, #1b5e20);
+      box-shadow: inset 0 8px 15px rgba(0,0,0,0.35);
+    }
+
+    /* ===== CONTADOR ===== */
+    .cq-contador {
+      font-size: 5rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
 
     /* ===== ANIMAÇÃO DE CLIQUE ===== */
-    .contador-botao-animacao {
-      transform: scale(0.95);
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
+    .cq-animacao {
+      transform: scale(0.94);
+      box-shadow: inset 0 -4px 10px rgba(0,0,0,0.45);
     }
 
     /* ===== BOTÃO RESET ===== */
-    .contador-reset {
+    .cq-reset {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 60px;
-      height: 60px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       border: none;
-      background: #1e293b;
-      color: #fff;
-      font-size: 1.5rem;
+      background: #1f1f1f;
+      color: #ffffff;
+      font-size: 28px;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
       transition: transform 0.2s ease, background 0.2s ease;
     }
 
-    .contador-reset:hover {
-      background: #334155;
+    .cq-reset:hover {
+      background: #333;
     }
 
-    .contador-reset:active {
+    .cq-reset:active {
       transform: scale(0.9);
     }
   </style>
 </head>
-<body>
 
-  <div class="contador-app-container">
-    <button class="contador-botao contador-botao-erro" id="btnErro">
-      <span id="contadorErro">0</span>
+<body>
+  <div class="cq-app">
+    <button id="btnErro" class="cq-botao cq-botao-erro">
+      <span id="contadorErro" class="cq-contador">0</span>
     </button>
 
-    <button class="contador-botao contador-botao-acerto" id="btnAcerto">
-      <span id="contadorAcerto">0</span>
+    <button id="btnAcerto" class="cq-botao cq-botao-acerto">
+      <span id="contadorAcerto" class="cq-contador">0</span>
     </button>
   </div>
 
-  <button class="contador-reset" id="btnReset">⟳</button>
+  <button id="btnReset" class="cq-reset">⟳</button>
 
   <script>
     const btnErro = document.getElementById('btnErro');
@@ -110,12 +112,12 @@
     const contadorAcerto = document.getElementById('contadorAcerto');
 
     // ===== CARREGAR DADOS =====
-    contadorErro.textContent = localStorage.getItem('contadorErro') || 0;
-    contadorAcerto.textContent = localStorage.getItem('contadorAcerto') || 0;
+    contadorErro.textContent = localStorage.getItem('cq_erros') || 0;
+    contadorAcerto.textContent = localStorage.getItem('cq_acertos') || 0;
 
-    function salvarDados() {
-      localStorage.setItem('contadorErro', contadorErro.textContent);
-      localStorage.setItem('contadorAcerto', contadorAcerto.textContent);
+    function salvar() {
+      localStorage.setItem('cq_erros', contadorErro.textContent);
+      localStorage.setItem('cq_acertos', contadorAcerto.textContent);
     }
 
     function vibrar() {
@@ -124,24 +126,24 @@
       }
     }
 
-    function animarBotao(botao) {
-      botao.classList.add('contador-botao-animacao');
+    function animar(botao) {
+      botao.classList.add('cq-animacao');
       setTimeout(() => {
-        botao.classList.remove('contador-botao-animacao');
+        botao.classList.remove('cq-animacao');
       }, 120);
     }
 
     btnErro.addEventListener('click', () => {
       contadorErro.textContent = Number(contadorErro.textContent) + 1;
-      salvarDados();
-      animarBotao(btnErro);
+      salvar();
+      animar(btnErro);
       vibrar();
     });
 
     btnAcerto.addEventListener('click', () => {
       contadorAcerto.textContent = Number(contadorAcerto.textContent) + 1;
-      salvarDados();
-      animarBotao(btnAcerto);
+      salvar();
+      animar(btnAcerto);
       vibrar();
     });
 
@@ -149,11 +151,10 @@
       if (confirm('Deseja zerar os contadores?')) {
         contadorErro.textContent = 0;
         contadorAcerto.textContent = 0;
-        salvarDados();
+        salvar();
         vibrar();
       }
     });
   </script>
-
 </body>
 </html>
