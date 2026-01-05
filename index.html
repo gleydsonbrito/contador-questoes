@@ -6,24 +6,21 @@
 <title>Contador de Questões</title>
 
 <style>
-/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* CONTAINER PRINCIPAL */
 .cq-app {
   height: 100dvh;
   display: flex;
   flex-direction: column;
+  background: #111;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   padding-bottom: env(safe-area-inset-bottom);
-  background: #111;
 }
 
-/* BOTÕES PRINCIPAIS */
 .cq-botao {
   height: 50%;
   width: 100%;
@@ -36,24 +33,23 @@
   align-items: center;
   justify-content: center;
   user-select: none;
+  box-shadow: inset 0 -6px 12px rgba(0,0,0,0.35);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
-  box-shadow: inset 0 -6px 12px rgba(115, 114, 114, 0.35);
 }
 
-/* ERROS */
+/* ESTADOS */
 .cq-botao-erro {
   background: linear-gradient(160deg, #ff5f5f, #c62828);
 }
 
-/* ACERTOS */
 .cq-botao-acerto {
   background: linear-gradient(160deg, #4caf50, #1b5e20);
 }
 
-/* ANIMAÇÃO DE CLIQUE */
-.cq-botao:active {
-  transform: scale(0.97);
-  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.45);
+/* ANIMAÇÃO CONTROLADA VIA JS */
+.cq-pressed {
+  transform: scale(0.96);
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.5);
 }
 
 /* BOTÃO RESET */
@@ -71,13 +67,11 @@
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(0,0,0,0.45);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
-/* FEEDBACK RESET */
-.cq-reset:active {
+.cq-reset.cq-pressed {
   transform: scale(0.9) rotate(-15deg);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 </style>
 </head>
@@ -92,32 +86,34 @@
 <button id="resetBtn" class="cq-reset">⟲</button>
 
 <script>
-/* ESTADO */
 let erros = Number(localStorage.getItem('cq_erros')) || 0;
 let acertos = Number(localStorage.getItem('cq_acertos')) || 0;
 
-/* ELEMENTOS */
 const erroBtn = document.getElementById('erroBtn');
 const acertoBtn = document.getElementById('acertoBtn');
 const resetBtn = document.getElementById('resetBtn');
 
-/* ATUALIZA UI */
 function atualizarTela() {
   erroBtn.textContent = erros;
   acertoBtn.textContent = acertos;
 }
 
-/* VIBRAÇÃO */
 function vibrar() {
-  if (navigator.vibrate) {
-    navigator.vibrate(20);
-  }
+  if (navigator.vibrate) navigator.vibrate(20);
 }
 
-/* EVENTOS */
+/* FUNÇÃO DE ANIMAÇÃO CONFIÁVEL */
+function animar(botao) {
+  botao.classList.remove('cq-pressed');
+  void botao.offsetWidth; // força reflow
+  botao.classList.add('cq-pressed');
+  setTimeout(() => botao.classList.remove('cq-pressed'), 120);
+}
+
 erroBtn.addEventListener('click', () => {
   erros++;
   localStorage.setItem('cq_erros', erros);
+  animar(erroBtn);
   vibrar();
   atualizarTela();
 });
@@ -125,6 +121,7 @@ erroBtn.addEventListener('click', () => {
 acertoBtn.addEventListener('click', () => {
   acertos++;
   localStorage.setItem('cq_acertos', acertos);
+  animar(acertoBtn);
   vibrar();
   atualizarTela();
 });
@@ -133,17 +130,16 @@ resetBtn.addEventListener('click', () => {
   const confirmar = confirm(
     'Tem certeza que deseja zerar os contadores?\n\nEssa ação não pode ser desfeita.'
   );
-
   if (!confirmar) return;
 
   erros = 0;
   acertos = 0;
   localStorage.clear();
+  animar(resetBtn);
   vibrar();
   atualizarTela();
 });
 
-/* INIT */
 atualizarTela();
 </script>
 
